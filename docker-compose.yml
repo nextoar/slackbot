@@ -1,0 +1,35 @@
+services:
+  app:
+    build: .
+    ports:
+      - "3001:3001"
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/slackbot
+    extra_hosts:
+      - "host.docker.internal:host-gateway"  # This allows container to resolve host.docker.internal
+    depends_on:
+      - db
+    volumes:
+      - .:/app
+    networks:
+      - slackbot-network
+
+  db:
+    image: postgres:15
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=slackbot
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - slackbot-network
+
+volumes:
+  postgres_data:
+
+networks:
+  slackbot-network:
+    driver: bridge 
